@@ -1,0 +1,41 @@
+//debugging pannel//
+
+a table can be made in a seperate file and it just logs everything to a portion of the screen , useful for things such as screen flags
+
+
+//CANVASES//
+https://love2d.org/wiki/Canvas
+By drawing things that do not change position often (such as background items) to the Canvas, and then drawing the entire Canvas instead of each item, you can reduce the number of draw operations performed each frame.
+crucial for efficiency
+
+
+
+//screen settings//
+
+how can this be made so that for now it doesnt need a gui but later it can be modified via gui?
+have it entirely depend on a table with just boolean or integer values
+similar to the screen flags however a potentially more varied list of things
+
+current screen flags:
+
+resizable ; bool
+centered ; bool
+highdpi ; bool
+usedpiscale ; bool
+stencil ; bool
+depth ; int
+x ; int
+y ; int
+minwidth ; int
+maxwidth ; int
+fullscreen ; bool
+fullscreentype ; choice of strings
+refreshrate ; int
+display ; int
+vsync ; 1/0
+msaa ; 0/1
+borderless ; bool
+
+of these how many should actually be used should change
+
+have be in fullscreen initially
