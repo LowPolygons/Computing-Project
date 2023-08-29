@@ -4,6 +4,7 @@ graphics = {
 			backgroundActiveColour = {150,150,150,255},
 			screenDecoration = { --purely for visual pleasure
 				testBox = {
+					zLayer = 0,
 					shape = "rectangle",
 					colour = {220, 220, 200, 255},
 					position = {0.05, 0.1},
@@ -15,6 +16,7 @@ graphics = {
 					textHozAlignPercentage = 0.025, 
 				},
 				testBox2 = {
+					zLayer = 1,
 					shape = "rectangle",
 					colour = {220, 220, 200, 255},
 					position = {0.65, 0.1},
@@ -26,6 +28,7 @@ graphics = {
 					textHozAlignPercentage = 0.025,
 				},
 				testCircle = {
+					zLayer = 2,
 					shape = "circle",
 					colour = {220, 220, 200, 255},
 					position = {0.45, 0.1},
@@ -33,6 +36,7 @@ graphics = {
 					height = 0,
 				},
 				testCircle2 = {
+					zLayer = -1,
 					shape = "circle",
 					colour = {20, 220, 30, 255},
 					position = {0.65, 0.5},
@@ -163,6 +167,7 @@ graphics = {
 			backgroundActiveColour = {0,0,0,255},
 			screenDecoration = { --purely for visual pleasure
 				testBox = {
+					zLayer = 0,
 					shape = "rectangle",
 					colour = {220, 220, 200, 255},
 					position = {0.05, 0.1},
@@ -174,6 +179,7 @@ graphics = {
 					textHozAlignPercentage = 0.3,
 				},
 				testCircle = {
+					zLayer = -1,
 					shape = "circle",
 					colour = {220, 220, 200, 255},
 					position = {0.45, 0.1},
@@ -362,12 +368,35 @@ function graphics:render()
 end
 
 function graphics:screenDecorationRendering(square, rectangle, circle)
-	for k,v in pairs(self.panes[self.currentPane].screenDecoration) do
+	--to render zlayers, loop through and determine the lowest and highest zLayer, then just use a counter and iterative loop pair to render each item in increasing zLayer
+	--COULD MAYBE OPTIMISE IN THE FUTURE
+	local lowestZLayer = math.huge --absurd figures so they always get over written on first instance
+	local highestZLayer = -math.huge
+
+	local _renderFunc = function(v)
 		love.graphics.setColor(v.colour[1]/255,v.colour[2]/255,v.colour[3]/255,v.colour[4]/255)
 		if v.shape == "circle" then
 			circle(v)
 		else
 			rectangle(v)
+		end
+	end
+	
+	for k,v in pairs(self.panes[self.currentPane].screenDecoration) do
+		local currZ = v.zLayer
+		if currZ < lowestZLayer then 
+			lowestZLayer = currZ
+		end
+		if currZ > highestZLayer then
+			highestZLayer = currZ
+		end
+	end
+	
+	for _zLayer = lowestZLayer, highestZLayer do
+		for k,v in pairs(self.panes[self.currentPane].screenDecoration) do
+			if v.zLayer == _zLayer then
+				_renderFunc(v)
+			end
 		end
 	end
 end
