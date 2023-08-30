@@ -158,7 +158,8 @@ graphics = {
 					textVertAlignPercentage = 0.3,
 					textHozAlignPercentage = 0.1,
 					func = function()
-						love.system.openURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+						testFunction()
+						--love.system.openURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 					end
 				},
 			},
@@ -688,4 +689,21 @@ function graphics:independentMovementHandler(m_x, m_y, scope)
 	scope.position = {newPos[1]/self.windowDimensionsX, newPos[2]/self.windowDimensionsY }
 	
 	love.system.setClipboardText("{"..scope.position[1]..","..scope.position[2].."}")
+end
+
+function testFunction()
+	local lol = {
+		poo = {
+			cheese = "Helloe",
+			i_hate_you = 3924.1234,
+			test_vals = {255, 123, 52,12443, 234234, 23421249449},
+		},
+		eggs = {
+			banana = "3io5rhg89",
+			i_hate_you_too = 3924.1234,
+			vest_tals = {255, 123, 52,12443, 234234, 23421249449},
+		}
+	}
+	
+	filehandling:storeData(lol)
 end

@@ -1,5 +1,6 @@
 main = {
 	files = { --order will matter
+		"filehandling",
 		"screensettings",
 		"graphics",
 	}
