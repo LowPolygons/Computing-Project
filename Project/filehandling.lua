@@ -40,14 +40,62 @@ filehandling = {
 
 --naturally due to the nature of this formatting concept, the data before being converted to a storable format must be in a similar table style format
 ]]--
+	reformat_number = function(v)
+		return tonumber(v)
+	end,
+	reformat_string = function(v)
+		return tostring(v)
+	end,
+	reformat_bool = function(v)
+		local _true = v:find("t", 1, true)
+		if _true then return true end
+		return false
+	end,
+	reformat_array_string = function(v)
+		local data = {}
+		local parsed = false
+		local currentIndex = 0
+		local newIndex = nil
+		v = v:sub(2, v:len()-1)--cutting off the {}
+		while not parsed do
+			newIndex = v:find(",",currentIndex+1,true)
+			if newIndex then
+				table.insert(data, tostring( v:sub(currentIndex+1,newIndex-1) ))
+				currentIndex = newIndex
+			else
+				table.insert(data, tostring( v:sub(currentIndex+1,v:len()) ))
+				parsed = true 
+			end
+		end
+		return data
+	end,
+	reformat_array_number = function(v)
+		local data = {}
+		local parsed = false
+		local currentIndex = 0
+		local newIndex = nil
+		v = v:sub(2, v:len()-1)--cutting off the {}
+		while not parsed do
+			newIndex = v:find(",",currentIndex+1,true)
+			if newIndex then
+				table.insert(data, tonumber( v:sub(currentIndex+1,newIndex-1) ))
+				currentIndex = newIndex
+			else
+				table.insert(data, tonumber( v:sub(currentIndex+1,v:len()) ))
+				parsed = true 
+			end
+		end
+		return data
+	end,
+	
 	number = function(k,v)
-		return "\t\tnumber : "..k.." = "..tostring(v)..";"
+		return "\t\t-number : "..k.." = "..tostring(v)..";"
 	end,
 	["string"] = function(k,v)
-		return "\t\tstring : "..k.." = "..tostring(v)..";"
+		return "\t\t-string : "..k.." = "..tostring(v)..";"
 	end,
 	bool = function(k,v)
-		return "\t\tstring : "..k.." = "..tostring(v)..";"
+		return "\t\t-bool : "..k.." = "..tostring(v)..";"
 	end,
 	array_string = function(k,v)
 		local arrayData = "{"
@@ -55,7 +103,7 @@ filehandling = {
 			arrayData = arrayData .. tostring(val) ..","
 		end
 		arrayData = arrayData:sub(1,arrayData:len()-1) .. "};" --gets rid of the last comma
-		return "\t\tarray_string : "..k.." = "..arrayData
+		return "\t\t-array_string : "..k.." = "..arrayData
 	end,
 	array_number = function(k,v)
 		local arrayData = "{"
@@ -63,7 +111,7 @@ filehandling = {
 			arrayData = arrayData .. tostring(val) ..","
 		end
 		arrayData = arrayData:sub(1,arrayData:len()-1) .. "};" --gets rid of the last comma
-		return "\t\tarray_number : "..k.." = "..arrayData
+		return "\t\t-array_number : "..k.." = "..arrayData
 	end,
 }
 
@@ -79,11 +127,11 @@ function filehandling:storeData(dataTable)
 	
 	writtenString = writtenString .. "\n" .. "]"
 	
-	success, message = love.filesystem.write( "testfile.txt", writtenString )
+	success, message = love.filesystem.write( "testfile.tris", writtenString )
 end
 
 function filehandling:segmentConverter(key, data)
-	local returnString = "\n\t" .. key .. " = (" --what will be appended to the file
+	local returnString = "\n\tsegment : " .. key .. " = (" --what will be appended to the file
 	
 	for k,v in pairs(data) do
 		returnString = returnString .. "\n" .. self[""..self:typeDeterminer(v)](k,v)
@@ -100,4 +148,64 @@ function filehandling:typeDeterminer(var)
 		return "array_"..type(var[1])
 	end
 	return type(var)
+end
+
+function filehandling:segmenter(filedata)
+	local returnTable = {}
+	local parsed = false
+	while not parsed do
+		local curlyBracket, _ignore = filedata:find("(", 1, true) --returns two values hence the _ignore
+		local closeCurly = nil
+		
+		local segmentName = nil
+		local currentSegment = nil
+		
+		if curlyBracket then
+			closeCurly, _ignore = filedata:find(")", 1, true)
+			currentSegment = filedata:sub(curlyBracket+1, closeCurly-1)
+			
+			local start, nameStart = filedata:find("segment : ", 1, true)
+			local nameEnd, _ignore = filedata:find(" = (", 1, true)
+			segmentName = filedata:sub(nameStart+1, nameEnd-1)
+			
+			returnTable[""..segmentName] = currentSegment
+			
+			filedata = filedata:sub(closeCurly+1, filedata:len())
+		else
+			parsed = true
+		end
+	end
+	
+	return returnTable
+end
+
+function filehandling:reformatter(filedata)
+	local filledTable = {}
+
+	local segmentTable = self:segmenter(filedata) --contains a table where the key is the segment name and the value is a string 
+	
+	for k,currentData in pairs(segmentTable) do
+		local parsed = false
+		local current_Data = {}
+		while not parsed do
+			local startOfLine = currentData:find("-", 1, true)
+			if startOfLine then
+				local endOfLine = currentData:find(";", 1, true)
+				--this should leave me with the indexes to leave smthn along the lines of `-type : variableName = value;`
+				local typeEnd, nameStart = currentData:find(" : ", 1, true)
+				local nameIsolator, valueStart = currentData:find(" = ", 1, true)
+				local name = currentData:sub(nameStart+1, nameIsolator-1)
+				local datatype = currentData:sub(startOfLine+1, typeEnd-1)
+				local value = currentData:sub(valueStart+1, endOfLine-1)
+				local returnedValue = self["reformat_"..datatype](value)
+				current_Data[name] = returnedValue
+				currentData = currentData:sub(endOfLine+1, currentData:len())
+			else 
+				parsed = true 
+			end
+		end
+		filledTable[k] = current_Data
+	end
+
+	return filledTable
 end
