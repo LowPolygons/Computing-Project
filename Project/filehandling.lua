@@ -115,6 +115,28 @@ filehandling = {
 	end,
 }
 
+function filehandling:csv_parser(v)
+	local data = {}
+	local parsed = false
+	local currentIndex = 0
+	local newIndex = nil
+	while not parsed do
+		newIndex = v:find(",",currentIndex+1,true)
+		if newIndex then
+			table.insert(data, v:sub(currentIndex+1,newIndex-1))
+			currentIndex = newIndex
+		else
+			if v:find(",", v:len()-1, true) then --incase the file has a comma at the very end
+				table.insert(data, v:sub(currentIndex+1,v:len()-1) )
+			else
+				table.insert(data, v:sub(currentIndex+1,v:len()) )
+			end
+			parsed = true 
+		end
+	end
+	return data
+end
+
 function filehandling:storeData(dataTable)
 	local segmentNames = {}
 	for k,v in pairs(dataTable) do table.insert(segmentNames, k) end --populating the above
