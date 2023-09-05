@@ -698,17 +698,19 @@ function testFunction()
 			i_hate_you = 3924.1234,
 			test_vals = {255, 123, 52,12443, 234234, 23421249449},
 			test_vals2 = {"all", "the", "small","things"},
+			black_sabbath = {"poo", "13492", "idiot man", "ben is silly"},
 		},
 		eggs = {
 			banana = "3io5rhg89",
 			i_hate_you_too = 3924.1234,
+			egronecrodefaeo = true,
 			vest_tals = {255, 123, 52,12443, 234234, 23421249449},
 		}
 	}
 	
 	filehandling:storeData(lol)
 	
-	local contents, size = love.filesystem.read("testfile.tris")
+	local contents, size = love.filesystem.read("testfile.sfl")
 	_table = filehandling:reformatter(contents)
 	--it flipping works
 end

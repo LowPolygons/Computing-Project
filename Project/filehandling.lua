@@ -1,7 +1,8 @@
 filehandling = {
 	--reading from a file
 		--formatting read file data
-		
+	
+	--Simple Formatting Language (.sfl files)
 	--writing to a file
 		--formatting data into a storable format
 			--CSV for named items
@@ -10,43 +11,44 @@ filehandling = {
 				-- ( ) to note the start and end of a section
 				-- { } to note an array if necessary
 				-- ; to note the end of a line
+				-- - to note the start of a line
 				-- : to seperate datatype to variablename
 				-- each line should take on following format:
 				-- datatype : name = value;
 					-- datatypes are `number`  `string`  `bool   `array_string`  `array_number`
-					--eg => number : clanPopulation = 121;
-					--eg => boolean : fightCooldown = true;
-					--eg => string : clanName = No Quotes Necessary;
-					--eg => array_string : parameterTypes = {strength, speed, intelligence};
-					--eg => array_number : previousAnnualPopulation = {100, 123, 242, 238, 388};
+					--eg => -number : clanPopulation = 121;
+					--eg => -boolean : fightCooldown = true;
+					--eg => -string : clanName = No Quotes Necessary;
+					--eg => -array_string : parameterTypes = {strength, speed, intelligence};
+					--eg => -array_number : previousAnnualPopulation = {100, 123, 242, 238, 388};
 				--arrays should have the data between the { } seperated and then treated as CSV
 
---example file
---[[ is as follows:
-[
-	clan1 = (
-		string : clanName = Vikings;
-		number : clanAge = 3;
-		array_number : populationHistory = {100, 150, 178};
-	)
-	clan2 = (
-		string : clanName = Saxons;
-		number : clanAge = 5;
-		array_number : populationHistory = {100, 150, 178}, 278, 300};
-	)
-]
+	--example file
+	--[[ is as follows:
+	[
+		clan1 = (
+			-string : clanName = Vikings;
+			-number : clanAge = 3;
+			-array_number : populationHistory = {100, 150, 178};
+		)
+		clan2 = (
+			-string : clanName = Saxons;
+			-number : clanAge = 5;
+			-array_number : populationHistory = {100, 150, 178}, 278, 300};
+		)
+	]
 
---above is exampled
+	--above is exampled
 
---naturally due to the nature of this formatting concept, the data before being converted to a storable format must be in a similar table style format
-]]--
+	--naturally due to the nature of this formatting concept, the data before being converted to a storable format must be in a similar table style format
+	]]--
 	reformat_number = function(v)
 		return tonumber(v)
 	end,
 	reformat_string = function(v)
 		return tostring(v)
 	end,
-	reformat_bool = function(v)
+	reformat_boolean = function(v)
 		local _true = v:find("t", 1, true)
 		if _true then return true end
 		return false
@@ -94,8 +96,8 @@ filehandling = {
 	["string"] = function(k,v)
 		return "\t\t-string : "..k.." = "..tostring(v)..";"
 	end,
-	bool = function(k,v)
-		return "\t\t-bool : "..k.." = "..tostring(v)..";"
+	boolean = function(k,v)
+		return "\t\t-boolean : "..k.." = "..tostring(v)..";"
 	end,
 	array_string = function(k,v)
 		local arrayData = "{"
@@ -149,7 +151,7 @@ function filehandling:storeData(dataTable)
 	
 	writtenString = writtenString .. "\n" .. "]"
 	
-	success, message = love.filesystem.write( "testfile.tris", writtenString )
+	success, message = love.filesystem.write( "testfile.sfl", writtenString )
 end
 
 function filehandling:segmentConverter(key, data)
