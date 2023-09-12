@@ -133,9 +133,32 @@ end
 function filehandling:storeData(dataTable, fileName)
 	fileName = fileName or "testfile.sfl"
 	local segmentNames = {}
-	for k,v in pairs(dataTable) do table.insert(segmentNames, k) end --populating the above
+	local otherNames = {}
+	for k,v in pairs(dataTable) do
+		if type(v) == "table" then
+			local segment = true
+			for x,y in pairs(v) do --pairs for the key
+				if type(x) == "number" then
+					segment = false
+					goto breakLoop --the rest is unecessary
+				end
+			end
+			::breakLoop::
+			if not segment then
+				otherNames[k] = v
+			else
+				table.insert(segmentNames, k) --populating the above
+			end
+		else
+			otherNames[k] = v
+		end
+	end
 	
 	local writtenString = "["
+	
+	for k,v in pairs(otherNames) do
+		writtenString = writtenString .. "\n" .. self[""..self:typeDeterminer(v)](k,v)
+	end	
 	
 	for k,v in ipairs(segmentNames) do
 		writtenString = writtenString .. self:segmentConverter(v, dataTable[""..v])

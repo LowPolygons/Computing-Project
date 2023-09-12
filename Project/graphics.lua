@@ -693,18 +693,20 @@ end
 
 function testFunction()
 	local clanExampleData = {
+		testOtherParam = "woah",
 		saxons = {
 			leader = "King Egbert",
-			population = 2489,
-			populationHistory = {100, 98, 123, 168, 359, 700, 1400},
+			population = -2489,
+			populationHistory = {100, -98, 123, 168, -359, 700, 1400},
 			stats = {"violence", "intelligence", "medicalQuality", "proneToViolence", "farming"},
 			saxons_statInfo = { --new file
+				localTest = "crazy",
 				saxons_violence = {
 						value = 0.5823,
 						affectingMultiplier = 2.24534,
 				},
 				saxons_intelligence = {
-						value = 0.9234,
+						value = -0.9234,
 						affectingMultiplier = 4.23482,
 				},
 				saxons_medicalQuality = {
@@ -712,13 +714,19 @@ function testFunction()
 						affectingMultiplier = 2.24534,
 				},
 				saxons_proneToViolence = {
-						value = 0.2223,
+						value = -0.2223,
 						affectingMultiplier = 0.9345,
 				},
 				saxons_farming = {
 						value = 0.9999,
 						affectingMultiplier = 5,
 				},
+			},
+			anotherTest = { --no longer being read?
+				hello = "test string",
+				number = 3.141592653589793234,
+				arrayString = {"a", "b", "c", "d"},
+				arrayNumber = {1,2,-3,4,5,6,7},
 			},
 		},
 		vikings = {
@@ -760,16 +768,6 @@ function testFunction()
 	
 	local contents, size = love.filesystem.read("clanData.sfl")
 	_table = filehandling:reformatter(contents)
-	
-	
-	local testingString = ""
-	
-	for k,v in pairs(_table.saxons) do
-		testingString = testingString .. k .. " = " .. tostring(v) .. "\n"
-	end                                    
-	for k,v in pairs(_table.vikings) do   
-		testingString = testingString .. k .. " = " .. tostring(v) .. "\n"
-	end
-	love.filesystem.write("test.lol", testingString)
-	--it flipping works
+	--testing if it works, which it does
+	--filehandling:storeData(_table, "Test.sfl")
 end

@@ -7,6 +7,7 @@ screensettings = {
 		x = 800,
 		y = 600,
 	},
+	
 	displaySettings = { --flags, these are fixed, must have the same variable name as in the flags structure
 		fullscreen = false,
 		centered = true,
@@ -19,15 +20,11 @@ screensettings = {
 	debugColour = {1,1,1,1},
 }
 
---love.graphics.setIcon
-
-
 function screensettings:init()
 	love.window.setTitle(self.fixed.windowTitle) --self explanatory
 	
 	--updates the those settings to the initial data of the screen, most relevant is the screenflags
 	self.displaySettings.x, self.displaySettings.y, self.screenFlags = love.window.getMode()
-	
 	
 	for k,v in pairs(self.displaySettings) do
 		self.screenFlags[k] = v
