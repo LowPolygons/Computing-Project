@@ -6,7 +6,7 @@ graphics = {
 				testBox = {
 					zLayer = 0,
 					shape = "rectangle",
-					colour = {220, 220, 200, 255},
+					colour = {220, 0, 0, 255},
 					position = {0.05, 0.1},
 					width = 0.4,
 					height = 0.8,
@@ -692,25 +692,84 @@ function graphics:independentMovementHandler(m_x, m_y, scope)
 end
 
 function testFunction()
-	local lol = {
-		poo = {
-			cheese = "Helloe",
-			i_hate_you = 3924.1234,
-			test_vals = {255, 123, 52,12443, 234234, 23421249449},
-			test_vals2 = {"all", "the", "small","things"},
-			black_sabbath = {"poo", "13492", "idiot man", "ben is silly"},
+	local clanExampleData = {
+		saxons = {
+			leader = "King Egbert",
+			population = 2489,
+			populationHistory = {100, 98, 123, 168, 359, 700, 1400},
+			stats = {"violence", "intelligence", "medicalQuality", "proneToViolence", "farming"},
+			saxons_statInfo = { --new file
+				saxons_violence = {
+						value = 0.5823,
+						affectingMultiplier = 2.24534,
+				},
+				saxons_intelligence = {
+						value = 0.9234,
+						affectingMultiplier = 4.23482,
+				},
+				saxons_medicalQuality = {
+						value = 0.8023,
+						affectingMultiplier = 2.24534,
+				},
+				saxons_proneToViolence = {
+						value = 0.2223,
+						affectingMultiplier = 0.9345,
+				},
+				saxons_farming = {
+						value = 0.9999,
+						affectingMultiplier = 5,
+				},
+			},
 		},
-		eggs = {
-			banana = "3io5rhg89",
-			i_hate_you_too = 3924.1234,
-			egronecrodefaeo = true,
-			vest_tals = {255, 123, 52,12443, 234234, 23421249449},
-		}
+		vikings = {
+			leader = "Ragnar Lothbrooke",
+			population = 593,
+			populationHistory = {100, 130, 235, 340, 430, 479},
+			stats = {"violence", "intelligence", "medicalQuality", "proneToViolence", "farming"},
+			vikings_statInfo = { --new file
+				vikings_violence = { --segment
+						value = 0.9823,
+						affectingMultiplier = 4.24534,
+						test_newFile = { --file
+							lol = { --segment
+								test = "wagwan"
+							},
+						},
+				},
+				vikings_intelligence = {
+						value = 0.2148,
+						affectingMultiplier = 1.32453,
+				},
+				vikings_medicalQuality = {
+						value = 0.023,
+						affectingMultiplier = 0.8543,
+				},
+				vikings_proneToViolence = {
+						value = 0.9999,
+						affectingMultiplier = 5,
+				},
+				vikings_farming = {
+						value = 0.7777,
+						affectingMultiplier = 3.888,
+				},
+			},
+		},
 	}
 	
-	filehandling:storeData(lol)
+	filehandling:storeData(clanExampleData, "clanData.sfl")
 	
-	local contents, size = love.filesystem.read("testfile.sfl")
+	local contents, size = love.filesystem.read("clanData.sfl")
 	_table = filehandling:reformatter(contents)
+	
+	
+	local testingString = ""
+	
+	for k,v in pairs(_table.saxons) do
+		testingString = testingString .. k .. " = " .. tostring(v) .. "\n"
+	end                                    
+	for k,v in pairs(_table.vikings) do   
+		testingString = testingString .. k .. " = " .. tostring(v) .. "\n"
+	end
+	love.filesystem.write("test.lol", testingString)
 	--it flipping works
 end

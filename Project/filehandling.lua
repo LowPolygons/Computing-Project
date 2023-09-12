@@ -15,7 +15,7 @@ filehandling = {
 				-- : to seperate datatype to variablename
 				-- each line should take on following format:
 				-- datatype : name = value;
-					-- datatypes are `number`  `string`  `bool   `array_string`  `array_number`
+					-- datatypes are `number`  `string`  `bool   `array_string`  `array_number`  and `file_reference`
 					--eg => -number : clanPopulation = 121;
 					--eg => -boolean : fightCooldown = true;
 					--eg => -string : clanName = No Quotes Necessary;
@@ -24,7 +24,7 @@ filehandling = {
 				--arrays should have the data between the { } seperated and then treated as CSV
 
 	--naturally due to the nature of this formatting concept, the data before being converted to a storable format must be in a similar table style format
-	]]--
+	
 	reformat_number = function(v)
 		return tonumber(v)
 	end,
@@ -72,6 +72,10 @@ filehandling = {
 		end
 		return data
 	end,
+	reformat_fileReference = function(v)
+		local contents, size = love.filesystem.read(v)
+		return filehandling:reformatter(contents)
+	end,
 	
 	number = function(k,v)
 		return "\t\t-number : "..k.." = "..tostring(v)..";"
@@ -98,6 +102,10 @@ filehandling = {
 		arrayData = arrayData:sub(1,arrayData:len()-1) .. "};" --gets rid of the last comma
 		return "\t\t-array_number : "..k.." = "..arrayData
 	end,
+	fileReference = function(k,v)
+		filehandling:storeData(v, k..".sfl")
+		return "\t\t-fileReference : "..k.." = "..k..".sfl;"
+	end,
 }
 
 function filehandling:csv_parser(v)
@@ -122,7 +130,8 @@ function filehandling:csv_parser(v)
 	return data
 end
 
-function filehandling:storeData(dataTable)
+function filehandling:storeData(dataTable, fileName)
+	fileName = fileName or "testfile.sfl"
 	local segmentNames = {}
 	for k,v in pairs(dataTable) do table.insert(segmentNames, k) end --populating the above
 	
@@ -134,7 +143,7 @@ function filehandling:storeData(dataTable)
 	
 	writtenString = writtenString .. "\n" .. "]"
 	
-	success, message = love.filesystem.write( "testfile.sfl", writtenString )
+	success, message = love.filesystem.write( fileName, writtenString )
 end
 
 function filehandling:segmentConverter(key, data)
@@ -149,12 +158,27 @@ end
 
 function filehandling:typeDeterminer(var)
 	if type(var) == "table" then
-		if not var[1] then --empty arrays can just be string arrays
-			return "array_string"
+		_type = fileReferenceOrArray(var)
+		if _type == "array" then 
+			if not var[1] then --empty arrays can just be string arrays
+				return "array_string"
+			end
+			return "array_"..type(var[1])
+		else
+			return "fileReference"
 		end
-		return "array_"..type(var[1])
 	end
 	return type(var)
+end
+
+function fileReferenceOrArray(_table)
+	for k,v in pairs(_table) do --in a basic array the key will be the index adn therefore will be a number
+		if type(k) == "number" then
+			return "array"
+		else 
+			return "fileReference"
+		end
+	end
 end
 
 function filehandling:segmenter(filedata)
