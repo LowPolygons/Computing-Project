@@ -23,23 +23,6 @@ filehandling = {
 					--eg => -array_number : previousAnnualPopulation = {100, 123, 242, 238, 388};
 				--arrays should have the data between the { } seperated and then treated as CSV
 
-	--example file
-	--[[ is as follows:
-	[
-		clan1 = (
-			-string : clanName = Vikings;
-			-number : clanAge = 3;
-			-array_number : populationHistory = {100, 150, 178};
-		)
-		clan2 = (
-			-string : clanName = Saxons;
-			-number : clanAge = 5;
-			-array_number : populationHistory = {100, 150, 178}, 278, 300};
-		)
-	]
-
-	--above is exampled
-
 	--naturally due to the nature of this formatting concept, the data before being converted to a storable format must be in a similar table style format
 	]]--
 	reformat_number = function(v)
