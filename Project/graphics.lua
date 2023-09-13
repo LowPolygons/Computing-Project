@@ -764,10 +764,10 @@ function testFunction()
 		},
 	}
 	
-	filehandling:storeData(clanExampleData, "clanData.sfl")
+	filehandling:storeData(clanExampleData, "clanExample.sfl")
 	
-	local contents, size = love.filesystem.read("clanData.sfl")
+	local contents, size = love.filesystem.read("clanExample.sfl")
 	_table = filehandling:reformatter(contents)
 	--testing if it works, which it does
-	--filehandling:storeData(_table, "Test.sfl")
+	filehandling:storeData(_table, "Test.sfl")
 end

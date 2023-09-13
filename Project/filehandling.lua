@@ -73,7 +73,7 @@ filehandling = {
 		return data
 	end,
 	reformat_fileReference = function(v)
-		local contents, size = love.filesystem.read(v)
+		local contents, size = filehandling:readFileData(v)
 		return filehandling:reformatter(contents)
 	end,
 	
@@ -134,30 +134,36 @@ function filehandling:storeData(dataTable, fileName)
 	fileName = fileName or "testfile.sfl"
 	local segmentNames = {}
 	local otherNames = {}
+	--ugly code alert but it gets the point across
 	for k,v in pairs(dataTable) do
-		if type(v) == "table" then
-			local segment = true
-			for x,y in pairs(v) do --pairs for the key
-				if type(x) == "number" then
-					segment = false
-					goto breakLoop --the rest is unecessary
+		if type(v) ~= "nil" and type(v) ~= "userdata" and type(v) ~= "function" and type(v) ~= "thread" then --any of these will be immediately ignored
+			if type(v) == "table" then
+				local segment = true
+				for x,y in pairs(v) do --pairs for the key
+					if type(x) == "number" then
+						segment = false
+						goto breakLoop --the rest is unecessary
+					end
 				end
-			end
-			::breakLoop::
-			if not segment then
-				otherNames[k] = v
+				::breakLoop::
+				if not segment then
+					otherNames[k] = v
+				else
+					table.insert(segmentNames, k) --populating the above
+				end
 			else
-				table.insert(segmentNames, k) --populating the above
+				otherNames[k] = v
 			end
-		else
-			otherNames[k] = v
 		end
 	end
 	
 	local writtenString = "["
 	
 	for k,v in pairs(otherNames) do
-		writtenString = writtenString .. "\n" .. self[""..self:typeDeterminer(v)](k,v)
+		local _type = self:typeDeterminer(v)
+		if _type ~= "ignore" then
+			writtenString = writtenString .. "\n" .. self["".._type](k,v)
+		end
 	end	
 	
 	for k,v in ipairs(segmentNames) do
@@ -166,32 +172,39 @@ function filehandling:storeData(dataTable, fileName)
 	
 	writtenString = writtenString .. "\n" .. "]"
 	
-	success, message = love.filesystem.write( fileName, writtenString )
+	success, message = filehandling:writeFileData(fileName, writtenString)
 end
 
 function filehandling:segmentConverter(key, data)
 	local returnString = "\n\tsegment : " .. key .. " = (" --what will be appended to the file
 	
 	for k,v in pairs(data) do
-		returnString = returnString .. "\n" .. self[""..self:typeDeterminer(v)](k,v)
-	end
+		local _type = self:typeDeterminer(v)
+		if _type ~= "ignore" then
+			returnString = returnString .. "\n" .. self["".._type](k,v)
+		end
+	end 
 	
 	return returnString .. "\n\t)"
 end
 
 function filehandling:typeDeterminer(var)
-	if type(var) == "table" then
-		_type = fileReferenceOrArray(var)
-		if _type == "array" then 
-			if not var[1] then --empty arrays can just be string arrays
-				return "array_string"
+	if type(var) ~= "nil" and type(var) ~= "userdata" and type(var) ~= "function" and type(var) ~= "thread" then --any of these will be immediately ignored
+		if type(var) == "table" then
+			local _type = fileReferenceOrArray(var)
+			if _type == "array" then 
+				if type(var[1]) == "number"  then
+					return "array_number"
+				end
+				return "array_string"--..type(var[1])
+			else
+				return "fileReference"
 			end
-			return "array_"..type(var[1])
-		else
-			return "fileReference"
 		end
+		return type(var)
+	else
+		return "ignore"
 	end
-	return type(var)
 end
 
 function fileReferenceOrArray(_table)
@@ -204,17 +217,21 @@ function fileReferenceOrArray(_table)
 	end
 end
 
+--POTENTIAL REWORK, SCAN FOR EVERY INSTANCE OF THE DIFFERENT TYPES AND THEN DO EACH ITEM IN TURN. FIRST DO A CHECK OF EVERY LOCATION OF SEGMENT, THEN THE VARIABLES. THIS ORDER IS CRUCIAL
+--AS YOU WILL NEVER HAVE A SEGMENT IN A SEGMENT THIS CAN BE DONE BY FINDING EVERY INSTANCE OF SEGMENT, THE NEXT ")" AND THEN CHECKING THINGS IN THERE. THIS IS IMPERITIVE FOR THE SHEBANG TO WORK
 function filehandling:segmenter(filedata)
 	local returnTable = {}
+	local current_Data = {}
 	local parsed = false
+	if filedata then
 	while not parsed do
 		local curlyBracket, _ignore = filedata:find("(", 1, true) --returns two values hence the _ignore
+		local segmentPresent = filedata:find("segment", 1, true)
 		local closeCurly = nil
-		
 		local segmentName = nil
 		local currentSegment = nil
 		
-		if curlyBracket then
+		if segmentPresent then
 			closeCurly, _ignore = filedata:find(")", 1, true)
 			currentSegment = filedata:sub(curlyBracket+1, closeCurly-1)
 			
@@ -224,19 +241,40 @@ function filehandling:segmenter(filedata)
 			
 			returnTable[""..segmentName] = currentSegment
 			
-			filedata = filedata:sub(closeCurly+1, filedata:len())
-		else
+			filedata = filedata:sub(1, start-1) .. filedata:sub(closeCurly+1, filedata:len())
+		end
+
+		local segmentPresent = filedata:find("segment", 1, true)
+		
+		
+		local startOfLine = filedata:find("-", 1, true)
+
+		if not segmentPresent and startOfLine then
+			endOfLine = filedata:find(";", 1, true)
+			--this should leave me with the indexes to leave smthn along the lines of `-type : variableName = value;`
+			typeEnd, nameStart = filedata:find(" : ", startOfLine, true)
+			nameIsolator, valueStart = filedata:find(" = ", startOfLine, true)
+			name = filedata:sub(nameStart+1, nameIsolator-1)
+			datatype = filedata:sub(startOfLine+1, typeEnd-1)
+			value = filedata:sub(valueStart+1, endOfLine-1)
+			
+			--love.system.setClipboardText(tostring(startOfLine+1) .."," .. tostring(typeEnd-1) .. "," .. tostring(name) .. tostring(datatype))
+			returnedValue = self["reformat_"..datatype](value)
+			filedata = filedata:sub(endOfLine+1, filedata:len())
+			current_Data[name] = returnedValue
+		end
+		if not filedata:find("-", 1, true) then
 			parsed = true
 		end
 	end
-	
-	return returnTable
+	end
+	return returnTable, current_Data
 end
 
 function filehandling:reformatter(filedata)
-	local filledTable = {}
 
-	local segmentTable = self:segmenter(filedata) --contains a table where the key is the segment name and the value is a string 
+	love.system.setClipboardText(love.system.getClipboardText() .. "," .. tostring(filedata))
+	local segmentTable, filledTable = self:segmenter(filedata) --contains a table where the key is the segment name and the value is a string 
 	
 	for k,currentData in pairs(segmentTable) do
 		local parsed = false
@@ -262,4 +300,15 @@ function filehandling:reformatter(filedata)
 	end
 
 	return filledTable
+end
+
+function filehandling:readFileData(fileName)
+	local contents, size = love.filesystem.read(fileName)
+	return contents, size
+end
+
+function filehandling:writeFileData(fileName, data)
+	local success, message = love.filesystem.write( fileName, data )
+	
+	return success, message
 end
