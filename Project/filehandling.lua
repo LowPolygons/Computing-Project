@@ -21,6 +21,7 @@ filehandling = {
 					--eg => -string : clanName = No Quotes Necessary;
 					--eg => -array_string : parameterTypes = {strength, speed, intelligence};
 					--eg => -array_number : previousAnnualPopulation = {100, 123, 242, 238, 388};
+					--eg => -file_reference : historicalStats = historicalStats.sfl;
 				--arrays should have the data between the { } seperated and then treated as CSV
 
 	--naturally due to the nature of this formatting concept, the data before being converted to a storable format must be in a similar table style format
@@ -250,15 +251,13 @@ function filehandling:segmenter(filedata)
 		local startOfLine = filedata:find("-", 1, true)
 
 		if not segmentPresent and startOfLine then
-			endOfLine = filedata:find(";", 1, true)
-			--this should leave me with the indexes to leave smthn along the lines of `-type : variableName = value;`
+			endOfLine = filedata:find(";", 1, true) --this should leave me with the indexes to leave smthn along the lines of `-type : variableName = value;`
 			typeEnd, nameStart = filedata:find(" : ", startOfLine, true)
 			nameIsolator, valueStart = filedata:find(" = ", startOfLine, true)
 			name = filedata:sub(nameStart+1, nameIsolator-1)
 			datatype = filedata:sub(startOfLine+1, typeEnd-1)
 			value = filedata:sub(valueStart+1, endOfLine-1)
 			
-			--love.system.setClipboardText(tostring(startOfLine+1) .."," .. tostring(typeEnd-1) .. "," .. tostring(name) .. tostring(datatype))
 			returnedValue = self["reformat_"..datatype](value)
 			filedata = filedata:sub(endOfLine+1, filedata:len())
 			current_Data[name] = returnedValue
@@ -272,8 +271,6 @@ function filehandling:segmenter(filedata)
 end
 
 function filehandling:reformatter(filedata)
-
-	love.system.setClipboardText(love.system.getClipboardText() .. "," .. tostring(filedata))
 	local segmentTable, filledTable = self:segmenter(filedata) --contains a table where the key is the segment name and the value is a string 
 	
 	for k,currentData in pairs(segmentTable) do

@@ -371,7 +371,7 @@ end
 function graphics:screenDecorationRendering(square, rectangle, circle)
 	--to render zlayers, loop through and determine the lowest and highest zLayer, then just use a counter and iterative loop pair to render each item in increasing zLayer
 	--COULD MAYBE OPTIMISE IN THE FUTURE
-	local lowestZLayer = math.huge --absurd figures so they always get over written on first instance
+	local lowestZLayer = math.huge  --absurd figures so they always get over written on first instance
 	local highestZLayer = -math.huge
 
 	local _renderFunc = function(v)
@@ -392,7 +392,7 @@ function graphics:screenDecorationRendering(square, rectangle, circle)
 			highestZLayer = currZ
 		end
 	end
-	
+	--inefficient loop
 	for _zLayer = lowestZLayer, highestZLayer do
 		for k,v in pairs(self.panes[self.currentPane].screenDecoration) do
 			if v.zLayer == _zLayer then
@@ -509,7 +509,6 @@ function graphics:textboxDataAppend(key, scancode, isrepeat) --for when a text b
 end
 
 function graphics:displayButtons(square, rectangle, circle)
-	
 	for k,v in pairs(self.panes[self.currentPane].buttons) do
 		if self.currentPressed == k then
 			if love.mouse.isDown(1) then
@@ -588,7 +587,7 @@ function graphics:mouseRender()
 	--cool bars
 	love.graphics.rectangle( "line", 0, y-(0.25*self.mouseEvents.mouseWidth), self.windowDimensionsX, self.mouseEvents.mouseWidth/2) --horizontal one
 	love.graphics.rectangle( "line", x-(0.25*self.mouseEvents.mouseWidth), 0, self.mouseEvents.mouseWidth/2 , self.windowDimensionsY) --horizontal one
-		
+	
 	self.mouseEvents.activeColour = self.mouseEvents.defaultColour
 		
 	if love.mouse.isDown(2) then
@@ -764,10 +763,24 @@ function testFunction()
 		},
 	}
 	
-	filehandling:storeData(clanExampleData, "clanExample.sfl")
 	
-	local contents, size = love.filesystem.read("clanExample.sfl")
+	local testData = {
+		wowow = "wwowowow",
+		cheese = {
+			noway = 1000,
+			hello = {
+				cowabunga = {
+					poo = "wow",
+					eggs = "jasoifjas",
+				},
+				hi = {212,124,2341,42},
+			}
+		}
+	}
+	filehandling:storeData(clanExampleData, "clanExampleData.sfl")
+	
+	local contents, size = filehandling:readFileData("clanExampleData.sfl")
 	_table = filehandling:reformatter(contents)
-	--testing if it works, which it does
-	filehandling:storeData(_table, "Test.sfl")
+	filehandling:storeData(_table, "clanExampleData_.sfl")
+	--testing if it works, which it does  
 end

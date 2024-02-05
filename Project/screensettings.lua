@@ -1,39 +1,36 @@
 screensettings = {
-	fixed = {
-		windowTitle = "Primordial Survival",
-	},
+	windowTitle = "Primordial Survival",
+	iconFileName = "icon.png",
 	
-	ingameSettings = { --these are alterable by the player eventually
-		x = 800,
-		y = 600,
-	},
-	
-	displaySettings = { --flags, these are fixed, must have the same variable name as in the flags structure
+	displaySettings = { --flags to change, name must match the acual flag key else they will not overwrite
 		fullscreen = false,
-		centered = true,
+		centered = false,
 		resizable = true,
+		vsync = 0,
+		minwidth = 1440,
+		minheight = 900,
 	},
 	
-	--these are what will be used in love functions and will be updated throughout the program
-	screenFlags = nil,
-	finalSettings = nil,
-	debugColour = {1,1,1,1},
+	ingameSettings = {
+		x = 1440,
+		y = 900,
+	},
+	
+	screenFlags = nil, --empty variable 
 }
 
 function screensettings:init()
-	love.window.setTitle(self.fixed.windowTitle) --self explanatory
+	love.window.setTitle(self.windowTitle) --self explanatory
 	
-	--updates the those settings to the initial data of the screen, most relevant is the screenflags
-	self.displaySettings.x, self.displaySettings.y, self.screenFlags = love.window.getMode()
-	
-	for k,v in pairs(self.displaySettings) do
-		self.screenFlags[k] = v
-	end
-	self.screenFlags.vsync = 0
-	love.window.setMode(self.ingameSettings.x, self.ingameSettings.y, self.screenFlags)
+	self.displaySettings.x, self.displaySettings.y, self.screenFlags = love.window.getMode() --gets the parameters
 
-	local filename = "icon.png"
-	local imageData = love.image.newImageData(filename)
+	for k,v in pairs(self.displaySettings) do --note about pairs loops: THESE DO NOT HAVE A SET ORDER
+		self.screenFlags[k] = v --update the variable in screenflags with name "k" to the value "v"
+	end
+	
+	love.window.setMode(self.ingameSettings.x, self.ingameSettings.y, self.screenFlags) --updates the screen to have the new parameters
+	
+	local imageData = love.image.newImageData(self.iconFileName)
 	local success = love.window.setIcon(imageData)
 end
 
