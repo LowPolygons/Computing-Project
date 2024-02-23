@@ -5,7 +5,9 @@ simulation = {
 	buttonDefaultRadius = 0.01,
 	paused = false,
 	saveDelay = 120, --seconds
-	
+	numOfWeeks = 0,
+	popDecreaseMod = 3,
+	popIncMod = 15,
 	multipliers = {},
 	affectors = {},
 }
@@ -46,6 +48,7 @@ function simulation:updateDebugInfo()
 	local things = {
 		["Focused Clan"] = self.focusedClan,
 		["Paused"] = tostring(self.paused),
+		["Weeks Passed"] = tostring(self.numOfWeeks)
 	}
 	local text = ""
 	
@@ -200,6 +203,7 @@ function simulation:naturalParamFluctuation()
 			end 
 		end
 	end
+	self.numOfWeeks = self.numOfWeeks + 1
 end
 
 function simulation:saveClans()
@@ -278,6 +282,56 @@ function simulation:init()
 	gameplayCooldown = 0
 end
 
+function simulation:populationIncrease()
+	for name, clanValue in pairs(self.clans) do
+		local p = clanValue.clanPopulation
+		local b = clanValue.desiretobreed
+		
+		clanValue.clanPopulation = math.max(0, math.floor(p + ((p*b) / 4)))
+	end
+end
+
+function simulation:populationDecrease()
+	for name, clanValue in pairs(self.clans) do
+		local p = clanValue.clanPopulation
+		local b = clanValue.desiretobreed
+		local a = clanValue.aggressiveness
+		local v = clanValue.violence
+		local I = clanValue.intelligence
+		local f = clanValue.hungerDurability
+		local w = clanValue.thirstDurability
+		local m = clanValue.medication
+		
+		local Q = ((p * a) / 4)
+		_Q = (Q * v/4)*(0.5 + math.random()/2)
+		p = p - _Q
+		Q = Q - _Q
+		Q = math.ceil(Q*(2-m)*(2-I))
+		p = p - Q
+		local X = math.abs((-1+f/2)*p/4) - math.abs((-1+w/2)*p/3)
+		p = p - X + (math.random(-1,1)*math.random()*0.05*X)
+		clanValue.clanPopulation = math.max(0, math.floor(p))
+		
+		if clanValue.clanPopulation == 0 then
+			self.clans[name] = nil
+			
+			if self.focusedClan == name then
+				local scope = graphics.data.maingameScreen.textBoxs
+				
+				for k,v in pairs(scope) do
+					v.box.storedData = ""
+				end		
+
+				self.focusedClan = ""
+			end
+			
+			graphics.data.maingameScreen.buttons[name].radius = 0
+			
+			self:saveClans()		
+		end
+	end
+end
+
 function simulation:update(dt)
 	if love.mouse.isDown(1) and graphics.currentFocus == "" and graphics.currentFocusType == "" and not graphics.textboxHasFocus then
 		self.focusedClan = ""
@@ -302,6 +356,13 @@ function simulation:update(dt)
 		if gameplayCooldown == 0 and not self.paused then
 			self:naturalParamFluctuation()
 			gameplayCooldown = 1
+			
+			if self.numOfWeeks % self.popIncMod == 0 then
+				self:populationIncrease()
+			end
+			if self.numOfWeeks % self.popDecreaseMod == 0 then
+				self:populationDecrease()
+			end
 		end
 	end
 	

@@ -194,6 +194,27 @@ graphics = {
 						graphics:generateIslandData()
 					end,
 				},
+				manualSave = {
+					["type"] = "rectangle",
+					dimensions = {.10,.10},
+					length = 0.15,
+					radius = 0.1,
+					position = {0.025,0.4},
+					idle_colour = {120,120,120,255},
+					hover_colour = {200,200,200,255},
+					pressed_colour = {100,100,100,255},
+					zLayer = 1,
+					label = "Manual Save",
+					labelPos = {0, 0.5},
+					labelColour = {255,255,255,255},
+					newX = 0.5,
+					newY = 0.5,
+					textAlign = "center",
+					positionMode = "default", --center or default
+					func = function()
+						simulation:saveClans()
+					end,
+				},
 				createClanData = {
 					["type"] = "rectangle",
 					dimensions = {.10,.10},
