@@ -1,7 +1,9 @@
 main = { -- a structure to contain any potentially important data needed throughout the main.lua file
 	files = {
 		"screensettings", --no .lua required
+		"filehandling",
 		"graphics",
+		"simulation",
 	}
 }
 for k,v in ipairs(main.files) do -- like "Import" in python, initialises any other files into the project
@@ -16,20 +18,23 @@ function love.draw() main:render() end		 -- utility. This will appear in all fil
 function main:init()
 	screensettings:init()
 	graphics:init()
+	simulation:init()
 end
 
 function main:update(dt)
 	screensettings:update(dt)
 	graphics:update(dt)
+	simulation:update(dt)
 end
 
 function main:render()
 	screensettings:render()
 	graphics:render()
+	simulation:render()
 end
 
 function main:uninit()
 	screensettings:uninit()
-	graphics:uninit()
+	simulation:uninit()
 end
 

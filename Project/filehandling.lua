@@ -305,7 +305,7 @@ function filehandling:readFileData(fileName)
 end
 
 function filehandling:writeFileData(fileName, data)
-	local success, message = love.filesystem.write( fileName, data )
+	local success, message = love.filesystem.write( fileName.."/"..fileName, data )
 	
 	return success, message
 end
