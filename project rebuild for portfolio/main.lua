@@ -3,6 +3,7 @@ main = { -- a structure to contain any potentially important data needed through
 		"screensettings", --no .lua required
 		"filehandling",
 		"graphics",
+		"maintenance",
 		"simulation",
 	}
 }
@@ -18,23 +19,28 @@ function love.draw() main:render() end		 -- utility. This will appear in all fil
 function main:init()
 	screensettings:init()
 	graphics:init()
+	maintenance:init()
 	simulation:init()
 end
 
 function main:update(dt)
 	screensettings:update(dt)
 	graphics:update(dt)
+	maintenance:update(dt)
 	simulation:update(dt)
 end
 
 function main:render()
 	screensettings:render()
 	graphics:render()
+	maintenance:render()
 	simulation:render()
 end
 
 function main:uninit()
 	screensettings:uninit()
+	graphics:uninit()
+	maintenance:uninit()
 	simulation:uninit()
 end
 

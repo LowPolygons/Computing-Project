@@ -316,7 +316,7 @@ graphics = {
 					hover_colour = {200,200,200,255},
 					pressed_colour = {100,100,100,255},
 					zLayer = 1,
-					label = "Jump Year",
+					label = "Jump Year - Laggy",
 					labelPos = {0, 0.5},
 					labelColour = {255,255,255,255},
 					newX = 0.5,
@@ -324,7 +324,11 @@ graphics = {
 					textAlign = "center",
 					positionMode = "default", --center or default
 					func = function()
-						--jumps a year
+						if not simulation.paused then
+							for x = 1, 52 do
+								simulation:naturalParamFluctuation()
+							end
+						end
 					end,
 				},
 				decadeSkip = {
@@ -337,7 +341,7 @@ graphics = {
 					hover_colour = {200,200,200,255},
 					pressed_colour = {100,100,100,255},
 					zLayer = 1,
-					label = "Jump Decade",
+					label = "Jump Decade - Very Laggy",
 					labelPos = {0, 0.5},
 					labelColour = {255,255,255,255},
 					newX = 0.5,
@@ -345,7 +349,11 @@ graphics = {
 					textAlign = "center",
 					positionMode = "default", --center or default
 					func = function()
-						--jumps a decade
+						if not simulation.paused then
+							for x = 1, 520 do
+								simulation:naturalParamFluctuation()
+							end
+						end
 					end,
 				},
 			},
@@ -695,7 +703,7 @@ graphics = {
 					["type"] = "rectangle",
 					dimensions = {0.1, 0.2},
 					position = {0.5025,0.01},
-					colour = {150,150,150,200},
+					colour = {150,150,150,0},
 					zLayer = 3,
 					label = "",
 					labelPos = {0.05, 0.05},
@@ -830,6 +838,13 @@ graphics = {
 					positionMode = "default", --center or default
 					func = function()
 						--nothing right now
+						local files = love.filesystem.getDirectoryItems("")
+						for k,v in ipairs(files) do 
+							if v ~= "multipliers.sfl" and v ~= "affectors.sfl" then
+								love.filesystem.remove(v)
+							end
+						end
+						simulation:deleteAllClans() 
 					end,
 				},
 				clearDirectory = {
@@ -853,6 +868,7 @@ graphics = {
 						for k,v in ipairs(files) do 
 							love.filesystem.remove(v)
 						end
+						simulation:deleteAllClans()
 					end,
 				},
 			},
@@ -1157,7 +1173,7 @@ function graphics:textboxDataAppend(key, scancode, isrepeat) --for when a text b
 	if self.textboxHasFocus then
 		local numberOnly = self.data[self.currentPane].textBoxs[self.textboxHasFocus].numberOnly or false
 		local scope = self.data[self.currentPane].textBoxs[self.textboxHasFocus].box --so i dont have to rewrite this bajillions of times excluding when actually changing data
-		local data = scope.storedData
+		local data = tostring(scope.storedData)
 		local width = self.font:getWidth(data.."M") --concatenated an additional character because we need to see if ading a character will overfow the textwrap
 		--i also used a wide character because id rather it under fills than over fills the box
 		 
@@ -1169,7 +1185,7 @@ function graphics:textboxDataAppend(key, scancode, isrepeat) --for when a text b
 			
 			local allowedChars = "1234567890."
 			
-			if scope.storedData:find(".", 1, true) then
+			if data:find(".", 1, true) then
 				allowedChars = "1234567890"
 			end
 			if allowedChars:find(scancode, 1, true) then --if the character that is being added is in the allowed chars list then
