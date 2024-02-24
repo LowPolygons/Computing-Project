@@ -861,7 +861,7 @@ graphics = {
 						--nothing right now
 						local files = love.filesystem.getDirectoryItems("")
 						for k,v in ipairs(files) do 
-							if v ~= "multipliers.sfl" and v ~= "affectors.sfl" then
+							if v ~= "multipliers.sfl" and v ~= "affectors.sfl" and v ~= "biomeMultipliers.sfl" and v ~= "numericalFigures.sfl" then
 								love.filesystem.remove(v)
 							end
 						end

@@ -1,4 +1,91 @@
 maintenance = {
+	
+	biomeMultipliers = {
+		["ocean"] = {
+			violence 		 = 0,
+			intelligence 	 = 0,
+			aggressiveness   = 0,
+			farming 		 = 0,
+			religiousness 	 = 0,
+			desiretobreed 	 = 0,
+			coldResistance   = 0,
+			heatResistance 	 = 0,
+			medication 		 = 0,
+			happiness		 = 0,
+			hungerDurability = 0,
+			thirstDurability = 0,
+		},
+		["grassLand"] = {
+			violence 		 = 1,
+			intelligence 	 = 1,
+			aggressiveness   = 1,
+			farming 		 = 2,
+			religiousness 	 = 1,
+			desiretobreed 	 = 2,
+			coldResistance   = 1.2,
+			heatResistance 	 = 0.8,
+			medication 		 = 1.2,
+			happiness		 = 1.5,
+			hungerDurability = 1.5,
+			thirstDurability = 1.5,
+		},
+		["forest"] = {
+			violence 		 = 1,
+			intelligence 	 = 1,
+			aggressiveness   = 1,
+			farming 		 = 1.4,
+			religiousness 	 = 1,
+			desiretobreed 	 = 1.2,
+			coldResistance   = 0.5,
+			heatResistance 	 = 1.5,
+			medication 		 = 1.2,
+			happiness		 = 1,
+			hungerDurability = 1.5,
+			thirstDurability = 1.5,
+		},
+		["mountains"] = {
+			violence 		 = 1.2,
+			intelligence 	 = 1,
+			aggressiveness   = 1.2,
+			farming 		 = 0.3,
+			religiousness 	 = 1,
+			desiretobreed 	 = 0.8,
+			coldResistance   = 2,
+			heatResistance 	 = 0.9,
+			medication 		 = 0.9,
+			happiness		 = 0.5,
+			hungerDurability = 0.6,
+			thirstDurability = 0.6,
+		},
+		["desert"] = {
+			violence 		 = 1.5,
+			intelligence 	 = 1,
+			aggressiveness   = 1.5,
+			farming 		 = 0.3,
+			religiousness 	 = 1,
+			desiretobreed 	 = 0.5,
+			coldResistance   = 0.9,
+			heatResistance 	 = 2,
+			medication 		 = 0.6,
+			happiness		 = 0.5,
+			hungerDurability = 0.5,
+			thirstDurability = 0.2,
+		},
+		["snow"] = {
+			violence 		 = 0.7,
+			intelligence 	 = 0.7,
+			aggressiveness   = 1.2,
+			farming 		 = 0.3,
+			religiousness 	 = 1,
+			desiretobreed 	 = 0.5,
+			coldResistance   = 2,
+			heatResistance 	 = 0.2,
+			medication 		 = 0.8,
+			happiness		 = 0.5,
+			hungerDurability = 0.7,
+			thirstDurability = 0.9,
+		},
+	},
 	multipliers = {
 		violence = {	--if a parameter has no influence on another, its multiplier is zero
 			violence 		 = {0},  
@@ -338,7 +425,16 @@ maintenance = {
 			hungerDurability = {-0.3,-0.1,-0.1,-0.5,-0.5,0,0,0},
 			thirstDurability = {0},		
 		},
-	}
+	},
+	numericalFigures = {
+		saveDelay = 120, --seconds	
+		popDecreaseMod = 3,
+		popIncMod = 15,
+		biomeMultiplierMod = 12,
+		defaultPopulation = "1000",		
+		buttonDefaultRadius = 0.01,
+		defaultValue = "1",
+	},
 }
 
 function maintenance:init()
@@ -358,6 +454,22 @@ function maintenance:init()
 	else
 		simulation.affectors = self.affectors
 		_, _ = filehandling:storeData(self.affectors, "affectors.sfl")
+	end
+	if love.filesystem.getInfo("biomeMultipliers.sfl") then
+		local bMs, size = filehandling:readFileData("biomeMultipliers.sfl")
+		local data = filehandling:reformatter(bMs)
+		simulation.biomeMultipliers = data
+	else
+		simulation.biomeMultipliers = self.biomeMultipliers
+		_, _ = filehandling:storeData(self.biomeMultipliers, "biomeMultipliers.sfl")
+	end
+	if love.filesystem.getInfo("numericalFigures.sfl") then
+		local nFs, size = filehandling:readFileData("numericalFigures.sfl")
+		local data = filehandling:reformatter(nFs)
+		simulation.numericalFigures = data
+	else
+		simulation.numericalFigures = self.numericalFigures
+		_, _ = filehandling:storeData(self.numericalFigures, "numericalFigures.sfl")
 	end
 end
 

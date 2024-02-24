@@ -1,15 +1,12 @@
 simulation = {
 	clans = {}, --to be populated
-	defaultValue = "1", -- may vary 
 	focusedClan = "", -- none by default
-	buttonDefaultRadius = 0.01,
 	paused = false,
-	saveDelay = 120, --seconds
 	numOfWeeks = 0,
-	popDecreaseMod = 3,
-	popIncMod = 15,
+	numericalFigures = {},
 	multipliers = {},
 	affectors = {},
+	biomeMultipliers = {},
 }
 
 function simulation:deleteClan()
@@ -52,6 +49,10 @@ function simulation:updateDebugInfo()
 	}
 	local text = ""
 	
+	if self.focusedClan ~= "" then
+		things["Current Clan's Biome"] = tostring(self.clans[self.focusedClan]["currentBiome"])
+	end
+	
 	for k,v in pairs(things) do
 		text = text .. k .. " : " .. v .. "\n"
 	end
@@ -70,19 +71,24 @@ function simulation:initialiseClan()
 	local name = ""
 	
 	for k,v in pairs(scope) do
-		if k ~= "clanName" then --handled seperately
+		if k ~= "clanName" and k ~= "clanPopulation" then --handled seperately
 			if v.box.storedData == "" and v.numberOnly then --if a parameter has not been filled in 
-				v.box.storedData = tostring(self.defaultValue)
+				v.box.storedData = tostring(self.numericalFigures.defaultValue)
 			end
 			tableOfValues[k] = tonumber(v.box.storedData) 
 		end
 	end
 	
+	if scope.clanPopulation.box.storedData == "" then
+		scope.clanPopulation.box.storedData = self.numericalFigures.defaultPopulation
+	end
 	if scope.clanName.box.storedData == "" then
 		scope.clanName.box.storedData = "Default_"..math.random(1000,9999) --random so no overwriting occurs
 	end
 	
 	name = scope.clanName.box.storedData 
+	tableOfValues["clanPopulation"] = scope.clanPopulation.box.storedData 
+	
 	--any further parsing or data addition needed is done here, etc population should be rounded to an integer.
 	
 	self.clans[name] = tableOfValues --creates the clan
@@ -97,7 +103,7 @@ end
 function simulation:clanButtonInitialisation(name, clan_data)
 	local defaultTable = {
 		["type"] = "circle",
-		radius = self.buttonDefaultRadius,
+		radius = self.numericalFigures.buttonDefaultRadius,
 		idle_colour = {},
 		position = {},
 		hover_colour = {},
@@ -277,23 +283,52 @@ function simulation:loadSavedClans()
 end
 
 function simulation:init()
-	saveTimer = self.saveDelay
+	saveTimer = self.numericalFigures.saveDelay
 	self:loadSavedClans()
 	gameplayCooldown = 0
 end
 
 function simulation:populationIncrease()
 	for name, clanValue in pairs(self.clans) do
-		local p = clanValue.clanPopulation
+		local p = tonumber(clanValue.clanPopulation)
 		local b = clanValue.desiretobreed
 		
 		clanValue.clanPopulation = math.max(0, math.floor(p + ((p*b) / 4)))
 	end
 end
 
+function simulation:environmentalEffects()
+	for name, clanValue in pairs(self.clans) do
+		
+		local currentBiome = ""
+		local clanpos = clanValue.position				
+		
+		for k,v in ipairs(graphics.defaultBiomeData) do --gets the biome the clan is on
+			if v.name ~= "ocean" then
+				local data = v.pixelData
+				local radius = data.radius
+				local pos = data.position			
+				local offset = {(clanpos[1]*graphics.screenDimensions[1])-pos[1],(clanpos[2]*graphics.screenDimensions[2])-pos[2]}
+				local distance = math.sqrt(offset[1]^2 + offset[2]^2)
+				
+				if distance <= radius then --it is within the biome
+					currentBiome = v.name
+					--love.system.setClipboardText(v.name)
+				end
+			end
+		end
+		
+		for k,v in pairs(self.biomeMultipliers[""..currentBiome]) do --multiplies by biome multipliers
+			clanValue[k] = math.max(0, math.min(2, clanValue[k] * v))
+		end
+		
+		clanValue["currentBiome"] = currentBiome
+	end
+end
+
 function simulation:populationDecrease()
 	for name, clanValue in pairs(self.clans) do
-		local p = clanValue.clanPopulation
+		local p = tonumber(clanValue.clanPopulation)
 		local b = clanValue.desiretobreed
 		local a = clanValue.aggressiveness
 		local v = clanValue.violence
@@ -302,14 +337,14 @@ function simulation:populationDecrease()
 		local w = clanValue.thirstDurability
 		local m = clanValue.medication
 		
-		local Q = ((p * a) / 4)
-		_Q = (Q * v/4)*(0.5 + math.random()/2)
+		local Q = ((p * a * (0.5 + math.random()/2)) / 4)
+		_Q = (Q * (2-v)/8)*(0.5 + math.random()/2)
 		p = p - _Q
 		Q = Q - _Q
 		Q = math.ceil(Q*(2-m)*(2-I))
 		p = p - Q
-		local X = math.abs((-1+f/2)*p/4) - math.abs((-1+w/2)*p/3)
-		p = p - X + (math.random(-1,1)*math.random()*0.05*X)
+		local X = math.abs((-1+f/2)*p/4) + math.abs((-1+w/2)*p/3)
+		p = p - X + (math.random(-1,1)*0.05*X)
 		clanValue.clanPopulation = math.max(0, math.floor(p))
 		
 		if clanValue.clanPopulation == 0 then
@@ -349,19 +384,26 @@ function simulation:update(dt)
 	gameplayCooldown = math.max(0, gameplayCooldown - dt) -- a counter that counts down in seconds to zero
 	
 	if graphics.currentPane == "maingameScreen" then
+		if self.numOfWeeks == 1 then
+			self:populationIncrease()
+			self:environmentalEffects()
+		end
 		if saveTimer == 0 then
-			saveTimer = self.saveDelay
+			saveTimer = self.numericalFigures.saveDelay
 			self:saveClans()
 		end
 		if gameplayCooldown == 0 and not self.paused then
 			self:naturalParamFluctuation()
 			gameplayCooldown = 1
 			
-			if self.numOfWeeks % self.popIncMod == 0 then
+			if self.numOfWeeks % self.numericalFigures.popIncMod == 0 then
 				self:populationIncrease()
 			end
-			if self.numOfWeeks % self.popDecreaseMod == 0 then
+			if self.numOfWeeks % self.numericalFigures.popDecreaseMod == 0 then
 				self:populationDecrease()
+			end
+			if self.numOfWeeks % self.numericalFigures.biomeMultiplierMod == 0 then
+				self:environmentalEffects()
 			end
 		end
 	end
