@@ -1,0 +1,141 @@
+Scenario One:
+
+P1: decrease dramatically
+
+Violence : 			unaffected
+Aggressiveness : 	increase
+Religiousness: 		decrease dramatically
+Cold Resistance: 	unaffected
+Happiness: 			decrease dramatically
+Intelligence: 		decrease
+Farming: 			unaffected
+Desire To Breed: 	unaffected
+Heat Resistance: 	unaffected
+Medication: 		decrease
+Hunger Durability: 	increase
+Thirst Durability: 	decrease
+
+P2: decrease dramatically
+
+Violence :			increase dramatically
+Aggressiveness :	increase
+Religiousness:		decrease
+Cold Resistance:	unaffected
+Happiness:			decrease dramatically
+Intelligence:		unaffected
+Farming:			decrease
+Desire To Breed:	increase
+Heat Resistance:	unaffected
+Medication:			decrease dramatically
+Hunger Durability:	increase
+Thirst Durability:	unaffected
+
+P3: decrease dramatically
+
+Violence :			increase
+Aggressiveness :	increase
+Religiousness:		unaffected
+Cold Resistance:	decrease
+Happiness:			decrease dramatically
+Intelligence:		decrease
+Farming:			decrease 
+Desire To Breed:	decrease
+Heat Resistance:	unaffected
+Medication:			unaffected
+Hunger Durability:	increase
+Thirst Durability:	decrease
+
+Scenario Two:
+
+P1: increase dramatically
+
+Violence : 			increase
+Aggressiveness : 	increase
+Religiousness: 		increase
+Cold Resistance: 	increase dramatically
+Happiness: 			decrease
+Intelligence: 		unaffected
+Farming: 			decrease dramatically
+Desire To Breed: 	increase
+Heat Resistance: 	unaffected
+Medication: 		increase
+Hunger Durability: 	unaffected
+Thirst Durability: 	decrease
+
+P2: increase
+
+Violence :			decrease dramatically
+Aggressiveness :	decrease
+Religiousness:		increase
+Cold Resistance:	increase
+Happiness:			increase
+Intelligence:		increase
+Farming:			unaffected
+Desire To Breed:	decrease
+Heat Resistance:	increase
+Medication:			increase
+Hunger Durability:	unaffected
+Thirst Durability:	unaffected
+
+P3: increase dramatically
+
+Violence :			decrease dramatically
+Aggressiveness :	decrease
+Religiousness:		decrease
+Cold Resistance:	increase
+Happiness:			increase dramatically
+Intelligence:		unaffected
+Farming:			unaffected
+Desire To Breed:	unaffected
+Heat Resistance:	increase
+Medication:			increase
+Hunger Durability:	unaffected
+Thirst Durability:	unaffected
+
+
+Scenario Three:
+
+P1: decrease
+
+Violence : 			increase
+Aggressiveness : 	increase
+Religiousness: 		increase
+Cold Resistance: 	unaffected
+Happiness: 			unaffected
+Intelligence: 		decrease
+Farming: 			increase
+Desire To Breed: 	increase
+Heat Resistance: 	unaffected
+Medication: 		decrease
+Hunger Durability: 	decrease
+Thirst Durability: 	unaffected
+
+P2:	decrease
+
+Violence :			increase
+Aggressiveness :	unaffected
+Religiousness:		increase
+Cold Resistance:	decrease
+Happiness:			decrease dramatically
+Intelligence:		decrease
+Farming:			unaffected
+Desire To Breed:	increase
+Heat Resistance:	decrease
+Medication:			decrease
+Hunger Durability:	decrease
+Thirst Durability:	decrease
+
+P3:	decrease
+
+Violence :			unaffected
+Aggressiveness :	unaffected
+Religiousness:		increase
+Cold Resistance:	unaffected
+Happiness:			unaffected
+Intelligence:		unaffected
+Farming:			unaffected
+Desire To Breed:	decrease
+Heat Resistance:	unaffected
+Medication:			decrease
+Hunger Durability:	decrease
+Thirst Durability:	decrease

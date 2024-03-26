@@ -1,5 +1,4 @@
 maintenance = {
-	
 	biomeMultipliers = {
 		["ocean"] = {
 			violence 		 = 0,

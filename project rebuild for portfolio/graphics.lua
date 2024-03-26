@@ -380,6 +380,7 @@ graphics = {
 			},
 			textBoxs = {
 				clanName = { --the names of these are VERY IMPORTANT. these are used later on
+					numberOnly = false,
 					outline = { --the width of the region is 0.35
 						colour = {120,120,120, 255},
 						dimensions = {0.15, 0.05},
@@ -995,6 +996,7 @@ graphics = {
 			size = 0, -- this is so that the program can know to fill the rest of the space in with water
 		}
 	},
+
 }
 local firstTick = true -- allows an "Init" section of each
 

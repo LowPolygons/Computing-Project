@@ -159,7 +159,7 @@ graphics = {
 					textHozAlignPercentage = 0.1,
 					func = function()
 						testFunction()
-						--love.system.openURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+						love.system.openURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 					end
 				},
 			},
@@ -762,25 +762,5 @@ function testFunction()
 			},
 		},
 	}
-	
-	
-	local testData = {
-		wowow = "wwowowow",
-		cheese = {
-			noway = 1000,
-			hello = {
-				cowabunga = {
-					poo = "wow",
-					eggs = "jasoifjas",
-				},
-				hi = {212,124,2341,42},
-			}
-		}
-	}
-	filehandling:storeData(clanExampleData, "clanExampleData.sfl")
-	
-	local contents, size = filehandling:readFileData("clanExampleData.sfl")
-	_table = filehandling:reformatter(contents)
-	filehandling:storeData(_table, "clanExampleData_.sfl")
 	--testing if it works, which it does  
 end
